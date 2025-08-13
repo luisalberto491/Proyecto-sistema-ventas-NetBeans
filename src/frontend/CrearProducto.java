@@ -4,6 +4,8 @@
  */
 package frontend;
 
+import backend.ProductosController;
+import javax.swing.JOptionPane;
 /**
  *
  * @author Apoyo Docente
@@ -13,8 +15,13 @@ public class CrearProducto extends javax.swing.JFrame {
     /**
      * Creates new form CrearProducto
      */
+    ProductosController product =new ProductosController();
+    
     public CrearProducto() {
         initComponents();
+        product.RellenarCombobox("categorias", "nombre", jComboBox1);
+        product.RellenarCombobox("proveedores", "nombre", jComboBox2);
+
     }
 
     /**
@@ -55,6 +62,11 @@ public class CrearProducto extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "CREAR PRODUCTO", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP));
 
         jButton2.setText("GUARDAR");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -112,9 +124,11 @@ public class CrearProducto extends javax.swing.JFrame {
             }
         });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecionar" }));
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecionar" }));
+
+        jTextField2.setText(" ");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -253,6 +267,39 @@ public class CrearProducto extends javax.swing.JFrame {
        this.dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+       
+     if( !jTextField1.getText().isEmpty() || !jTextField4.getText().isEmpty() || !jTextField3.getText().isEmpty() 
+         || !jTextField5.getText().isEmpty()||jComboBox1.getSelectedIndex() != 0 || jComboBox2.getSelectedIndex() != 0){
+         
+        String nombre = jTextField1.getText();
+        String descripcion = jTextField2.getText();
+        float preciocompra = Float.parseFloat(jTextField4.getText());
+        float presioventa = Float.parseFloat(jTextField3.getText());
+        int stock = Integer.parseInt(jTextField5.getText());
+       
+        int categoria = jComboBox1.getSelectedIndex();
+        int proveedor = jComboBox2.getSelectedIndex();  
+             
+        String img = jTextField8.getText();
+        if ( img.isEmpty()){
+          JOptionPane.showMessageDialog(null, "Cargue una imagen");
+        }else{
+        
+         boolean bol = product.insertarProducto(nombre, descripcion,preciocompra,presioventa,stock,categoria,proveedor,img);    
+         if(bol){
+            
+            this.dispose();
+        }
+      }
+               
+     }else{
+         JOptionPane.showMessageDialog(null, "Rellene todas las casillas");
+     }
+         
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+  
     /**
      * @param args the command line arguments
      */

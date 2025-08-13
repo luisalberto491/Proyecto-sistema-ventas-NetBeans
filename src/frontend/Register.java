@@ -134,20 +134,15 @@ public class Register extends javax.swing.JFrame {
         if(nombre.isEmpty()|email.isEmpty()|contraseña.isEmpty()){
             JOptionPane.showMessageDialog(null, "Debe completar todos los campos");
         }else{
-          boolean bol = registro.AuthRegister(nombre, email, contraseña);
-          if(bol){
-              abrirLogin();
-          }
+          
+         registro.AuthRegister(nombre, email, contraseña);          
+         EstaLogueado();
         }   
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         
-       if(Sesión.estaLogueado()){
-         this.dispose();
-       }else{
-         abrirLogin();
-       }
+       EstaLogueado();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     public void abrirLogin(){
@@ -156,6 +151,15 @@ public class Register extends javax.swing.JFrame {
         login.setVisible(true);
         this.dispose();
     }  
+    
+    public void EstaLogueado(){
+       
+        if(Sesión.estaLogueado()){
+         this.dispose();
+       }else{
+         abrirLogin();
+       } 
+    }
     
     /**
      * @param args the command line arguments

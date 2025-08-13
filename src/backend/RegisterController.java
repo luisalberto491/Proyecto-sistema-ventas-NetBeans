@@ -21,12 +21,13 @@ public class RegisterController {
         
     }
     
-    public boolean AuthRegister(String nombre,String email,String contraseña) {
+    public void AuthRegister(String nombre,String email,String contraseña) {
     String sql = "INSERT INTO usuarios (nombre, email, contraseña, estado) VALUES (?, ?, ?, ?)";
 
     try (
         Connection cn = ConexionBD.conectar();
         PreparedStatement ps = cn.prepareStatement(sql);) {
+        
         ps.setString(1, nombre);
         ps.setString(2, email);
         ps.setString(3, contraseña);
@@ -36,15 +37,12 @@ public class RegisterController {
 
         if (filasAfectadas > 0) {
             JOptionPane.showMessageDialog(null, "¡Usuario registrado correctamente!");
-            return true;
         } else {
             JOptionPane.showMessageDialog(null, "No se pudo registrar el usuario.");
-            return false;
         }
 
     } catch (SQLException e) {
         JOptionPane.showMessageDialog(null, "Error al registrar usuario: " + e.getMessage());
-        return false;
     }
 }
 

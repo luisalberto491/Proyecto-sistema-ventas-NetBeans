@@ -8,6 +8,7 @@ import Base_De_Datos.ConexionBD;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -20,6 +21,34 @@ public class ProductosController {
     
    public ProductosController(){
        
+   }
+   public boolean insertarProducto(String nombre,String descripcion, float preciocompra, float presioventa, int stock, int categoria, int proveedor, String img){
+    
+       String sql = "INSERT INTO productos (nombre, descripcion, precio_compra, precio_venta, stock, categoria_id, proveedor_id)"
+               + "   VALUES (?,?,?,?,?,?,?);";
+       try (
+            Connection conn = ConexionBD.conectar();    
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ){
+           
+           ps.setString(1, nombre);
+           ps.setString(2, descripcion);
+           ps.setFloat(3, preciocompra);
+           ps.setFloat(4, presioventa);
+           ps.setInt(5, stock);
+           ps.setInt(6, categoria);
+           ps.setInt(7, proveedor);
+           //ps.setString(8, img);
+           
+           int filasafectadas = ps.executeUpdate();
+           if(filasafectadas > 0 ){
+               JOptionPane.showMessageDialog(null, "Producto Registrado Exitosamente");
+               return true;
+           }      
+       } catch (Exception e) {
+           JOptionPane.showMessageDialog(null, "ERROR" + e);      
+       }
+       return false;  
    }
    
    public DefaultTableModel TablaProductos(){
@@ -66,4 +95,48 @@ public class ProductosController {
 
         return modelo;
    }
+   
+   public void RellenarCombobox(String tabla, String valor, JComboBox combo){
+       
+       String sql ="SELECT * FROM "+ tabla;
+       try (
+            Connection conn = ConexionBD.conectar();    
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+        ){
+           while (rs.next()) {               
+               
+               //int id = rs.getInt("id");
+               //String nombre = rs.getString(valor);          
+               combo.addItem(rs.getString(valor));
+           }
+           
+       } catch (Exception e) {
+           JOptionPane.showMessageDialog(null, "ERROR" + e.toString());
+       }
+   }
+   
+   public float getPrecio(String nombre){
+      
+    //continuar aqui querias obtener fecha precio imagen para colocar en la pantalla de ventas 
+    String sql = "select  precio_venta from productos where nombre = ?;";
+    float precio = 0;
+      
+    try (Connection conn = ConexionBD.conectar();
+         PreparedStatement pst = conn.prepareStatement(sql)) {
+
+        pst.setString(1, nombre);
+
+        ResultSet rs = pst.executeQuery();
+        rs.next();
+        precio  = rs.getFloat("precio_venta");
+        
+
+     } catch (Exception e) {
+        System.err.println("Error : " + e.getMessage());
+        }
+    return precio;
+   }
+           
+          
 }
