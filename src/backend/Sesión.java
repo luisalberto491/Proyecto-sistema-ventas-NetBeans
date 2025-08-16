@@ -44,14 +44,4 @@ public class Sesión {
         nombre = null;
         correo = null;
     }
-    
-    public static void main(String[] args) {
-       
-        Sesión.iniciarSesion(1,"luis","luis@gmail.com");
-        System.out.println(Sesión.estaLogueado()+" "+Sesión.getId()+" "+Sesión.getNombre()+" "+Sesión.getCorreo());  
-        Sesión.cerrarSesion();
-        System.out.println(Sesión.estaLogueado()+" "+Sesión.getId()+" "+Sesión.getNombre()+" "+Sesión.getCorreo());  
-
-    }
-
 }

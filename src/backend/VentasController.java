@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-
 /**
  *
  * @author LENOVO
@@ -24,17 +23,17 @@ public class VentasController {
     
     public DefaultTableModel TablaVentas(){
        
-       String[] columnas = {"N°","Usuario","Total", "Fecha"};
+       String[] columnas = {"N°","Usuario","Fecha","Total"};
        DefaultTableModel modelo = new DefaultTableModel(null, columnas); 
        
        String sql = """
                     SELECT 
-                        ventas.id, 
-                        usuarios.nombre,
-                        ventas.total,
-                        ventas.fecha
+                      ventas.id, 
+                      usuario.nombre,
+                      ventas.fecha,
+                      ventas.total
                     FROM ventas
-                    INNER JOIN usuarios ON ventas.usuario_id = usuarios.id;"""; 
+                    INNER JOIN usuario ON ventas.id_usuario = usuario.id;"""; 
        
         try (
             Connection conn = ConexionBD.conectar();    
@@ -45,8 +44,8 @@ public class VentasController {
                 Object[] fila = new Object[4];
                 fila[0] = rs.getInt("id");
                 fila[1] = rs.getString("nombre");
-                fila[2] = rs.getFloat("total");
-                fila[3] = rs.getDate("fecha");  
+                fila[2] = rs.getDate("fecha");
+                fila[3] = rs.getFloat("total");  
                 modelo.addRow(fila);
             }
             
@@ -57,19 +56,19 @@ public class VentasController {
     
     public DefaultTableModel TablaDetalleVentas(){
         
-        String[] columnas = {"N°","IDventa","Producto", "Cantidad", "Precio Unitario", "Total"};
+        String[] columnas = {"N°","venta","Producto", "Cantidad", "Precio Unitario", "Total"};
         DefaultTableModel modelo = new DefaultTableModel(null, columnas);
 
         String sql = """
                      SELECT 
-                            detalle_ventas.id, 
-                            detalle_ventas.venta_id,
-                            productos.nombre, 
-                            detalle_ventas.cantidad, 
-                            detalle_ventas.precio_unitario,
-                            detalle_ventas.subtotal
-                     FROM detalle_ventas
-                     INNER JOIN productos ON detalle_ventas.producto_id = productos.id""";
+                        detalle_venta.id, 
+                        detalle_venta.id_venta,
+                        producto.nombre, 
+                        detalle_venta.cantidad, 
+                        detalle_venta.precio_unitario,
+                        detalle_venta.subtotal
+                    FROM detalle_venta
+                    INNER JOIN producto ON detalle_venta.id_producto = producto.id;""";
 
         try(
             Connection conn = ConexionBD.conectar();    
@@ -81,7 +80,7 @@ public class VentasController {
             while (rs.next()) {
                 Object[] fila = new Object[6];
                 fila[0] = rs.getInt("id");
-                fila[1] = rs.getInt("venta_id");
+                fila[1] = rs.getInt("id_venta");
                 fila[2] = rs.getString("nombre");
                 fila[3] = rs.getInt("cantidad");
                 fila[4] = rs.getFloat("precio_unitario");  
@@ -114,13 +113,66 @@ public class VentasController {
         return totalventas;
     }
     
-  public void RegistrarVentas(String producto,float precio, int cantidad,float total,String detalle){
-      
-     String sqlVenta = "INSERT INTO ventas (usuario_id, total, fecha) VALUES (1, 3.55, NOW());";
-     String sqlDetalle = "INSERT INTO detalle_ventas (venta_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (1, 1, 2, 1.00, 2.00)";
+  public boolean RegistrarVentas(String producto,double precio_unitario, int cantidad,double total_pagar){
+     
+     int id_usuario = Sesión.getId();
+     String sql = "INSERT INTO ventas (id_usuario, fecha, total) VALUES (?,NOW(),?);";
+     String sql2 = "SELECT id FROM ventas ORDER BY id DESC LIMIT 1;";
+     String sql3 = "select id from producto where nombre = ?;";
+      try (
+            
+            Connection conn = ConexionBD.conectar();    
+            PreparedStatement ps = conn.prepareStatement(sql); 
+            // consulta para sacar id de ventas 
+            PreparedStatement ps2 = conn.prepareStatement(sql2);
+            ResultSet rs2 = ps2.executeQuery();
+            //Consulta para sacar id de producto  
+            PreparedStatement ps3 = conn.prepareStatement(sql3);
+           ){
+                
+           ps.setInt(1, id_usuario);
+           ps.setDouble(2, total_pagar);
+           
+           ps3.setString(1, producto);          
+           ResultSet rs3 = ps3.executeQuery();
+           
+           int filasafectadas = ps.executeUpdate();
+           if(filasafectadas > 0 ){
+               
+               rs2.next();
+               rs3.next();
+               RegistrarDetalleDeVenta(rs2.getInt("id"), rs3.getInt("id"), cantidad, precio_unitario);
+               JOptionPane.showMessageDialog(null, "Venta Registrada Exitosamente");
+               return true;
+           }
+      } catch (Exception e) {
+              JOptionPane.showMessageDialog(null, "No se pudo Registrala Venta" + e);           
+              return false;        
+      }
+      return false;
   }
   
-  public void RegistrarDetalleDeVenta(){
+  private void RegistrarDetalleDeVenta(int idventa, int idproducto,int cantidad, double precio_unitario){
+    
+    String sql = "INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
       
+    try (
+         Connection conn = ConexionBD.conectar();    
+         PreparedStatement ps = conn.prepareStatement(sql);   
+         ){
+          ps.setInt(1, idventa);
+          ps.setInt(2, idproducto);
+          ps.setInt(3, cantidad);
+          ps.setDouble(4, precio_unitario);
+         
+         int filasafectadas = ps.executeUpdate();
+         if(filasafectadas > 0){
+            JOptionPane.showMessageDialog(null, "Se Registro el detalle de venta");          
+            //return true;
+         }               
+      } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "No se Registro el detalle de venta" + e);          
+            //return false;
+      }
   }
 }

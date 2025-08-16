@@ -26,10 +26,10 @@ public class UsuarioController {
 
     public DefaultTableModel TablaUsuarios() {
 
-        String[] columnas = {"N°", "Nombre", "Correo", "Estado"};
+        String[] columnas = {"N°", "Nombre", "Correo"};
         DefaultTableModel modelo = new DefaultTableModel(null, columnas);
 
-        String sql = "SELECT id, nombre, email, estado FROM usuarios";
+        String sql = "SELECT id, nombre, correo FROM usuario;";
 
         try(
             Connection conn = ConexionBD.conectar();    
@@ -38,11 +38,10 @@ public class UsuarioController {
             ) 
         {
             while (rs.next()) {
-                Object[] fila = new Object[4];
+                Object[] fila = new Object[3];
                 fila[0] = rs.getInt("id");
                 fila[1] = rs.getString("nombre");
-                fila[2] = rs.getString("email");
-                fila[3] = rs.getBoolean("estado") ? "Activo" : "Inactivo";    
+                fila[2] = rs.getString("correo");  
                 modelo.addRow(fila);
             }
         } catch (Exception e) {

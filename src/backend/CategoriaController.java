@@ -23,10 +23,10 @@ public class CategoriaController {
     
     public DefaultTableModel TablaCategoria(){
         
-        String[] columnas = {"N°", "Nombre", "Descripcion"};
+        String[] columnas = {"N°", "Nombre"};
         DefaultTableModel modelo = new DefaultTableModel(null, columnas);
 
-        String sql = "SELECT id, nombre,descripcion FROM categorias";
+        String sql = "SELECT id, nombre FROM categoria;";
 
         try(
             Connection conn = ConexionBD.conectar();    
@@ -35,10 +35,9 @@ public class CategoriaController {
             ) 
         {
             while (rs.next()) {
-                Object[] fila = new Object[3];
+                Object[] fila = new Object[2];
                 fila[0] = rs.getInt("id");
                 fila[1] = rs.getString("nombre");
-                fila[2] = rs.getString("descripcion");
                 modelo.addRow(fila);
             }
         } catch (Exception e) {
@@ -46,5 +45,26 @@ public class CategoriaController {
         }
 
         return modelo;
+    }
+    
+    public boolean insertarCategoria(String nombre){
+        
+        String sql = " INSERT INTO categoria (nombre) VALUES (?);";
+        
+        try(Connection conn = ConexionBD.conectar();
+            PreparedStatement pst = conn.prepareStatement(sql)) {
+
+            pst.setString(1, nombre);
+           
+           int filasafectadas = pst.executeUpdate();
+           if(filasafectadas > 0 ){
+            JOptionPane.showMessageDialog(null, "Categoria Registrada Exitosamente");
+            return true;
+           }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Categoria no se Registrado Exitosamente");
+            return false;
+        }
+            return false;
     }
 }

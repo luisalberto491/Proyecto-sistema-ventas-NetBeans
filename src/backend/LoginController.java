@@ -23,7 +23,7 @@ public class LoginController {
     }
     
     public boolean AuthLogin(String email, String password) {
-    String sql = "SELECT * FROM usuarios WHERE email = ? AND contraseña = ?";
+    String sql = "SELECT * FROM usuario WHERE correo = ? AND contraseña = ?";
    
     try (Connection conn = ConexionBD.conectar();
          PreparedStatement pst = conn.prepareStatement(sql)) {
@@ -36,7 +36,7 @@ public class LoginController {
          if (rs.next()) { // Mover al primer resultado si existe
             int id = rs.getInt("id");
             String nombre = rs.getString("nombre");
-            String correo = rs.getString("email");
+            String correo = rs.getString("correo");
 
             Sesión.iniciarSesion(id, nombre, correo);
             return true; // Usuario encontrado

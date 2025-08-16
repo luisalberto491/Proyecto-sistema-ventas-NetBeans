@@ -23,10 +23,10 @@ public class ProveedorController {
     
     public DefaultTableModel proveedorTabla(){
         
-        String[] columnas = {"N°", "Nombre", "Telefono", "Email","Direccion"};
+        String[] columnas = {"N°", "Nombre", "Telefono","Direccion"};
         DefaultTableModel modelo = new DefaultTableModel(null, columnas);
 
-        String sql = "SELECT id, nombre,telefono, email,direccion FROM proveedores";
+        String sql = "SELECT id, nombre,telefono,direccion FROM proveedor";
 
         try(
             Connection conn = ConexionBD.conectar();    
@@ -35,12 +35,11 @@ public class ProveedorController {
             ) 
         {
             while (rs.next()) {
-                Object[] fila = new Object[5];
+                Object[] fila = new Object[4];
                 fila[0] = rs.getInt("id");
                 fila[1] = rs.getString("nombre");
                 fila[2] = rs.getString("telefono");
-                fila[3] = rs.getString("email");
-                fila[4] = rs.getString("direccion");
+                fila[3] = rs.getString("direccion");
                 modelo.addRow(fila);
             }
         } catch (Exception e) {
@@ -48,5 +47,27 @@ public class ProveedorController {
         }
 
         return modelo;
+    }
+    public boolean insertarProveedor(String nombre, String telefono, String direccion){
+        
+        String sql = " INSERT INTO proveedor (nombre, telefono, direccion) VALUES (?, ?, ?);";
+        
+        try(Connection conn = ConexionBD.conectar();
+            PreparedStatement pst = conn.prepareStatement(sql)) {
+
+            pst.setString(1, nombre);
+            pst.setString(2, telefono);
+            pst.setString(3, direccion);
+           
+           int filasafectadas = pst.executeUpdate();
+           if(filasafectadas > 0 ){
+            JOptionPane.showMessageDialog(null, "Proveedor Registrado Exitosamente");
+            return true;
+           }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "proveedor No se Registrado Exitosamente");
+            return false;
+        }
+            return false;
     }
 }

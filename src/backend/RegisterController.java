@@ -21,18 +21,17 @@ public class RegisterController {
         
     }
     
-    public void AuthRegister(String nombre,String email,String contraseña) {
-    String sql = "INSERT INTO usuarios (nombre, email, contraseña, estado) VALUES (?, ?, ?, ?)";
-
+    public void AuthRegister(String nombre,String correo,String contraseña) {
+    String sql = "INSERT INTO usuario (nombre, correo, contraseña) VALUES (?,?,?);";
+                  
     try (
         Connection cn = ConexionBD.conectar();
         PreparedStatement ps = cn.prepareStatement(sql);) {
         
         ps.setString(1, nombre);
-        ps.setString(2, email);
+        ps.setString(2, correo);
         ps.setString(3, contraseña);
-        ps.setBoolean(4, true);
-
+        
         int filasAfectadas = ps.executeUpdate();
 
         if (filasAfectadas > 0) {

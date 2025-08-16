@@ -5,9 +5,12 @@
 package backend;
 
 import Base_De_Datos.ConexionBD;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -22,10 +25,12 @@ public class ProductosController {
    public ProductosController(){
        
    }
-   public boolean insertarProducto(String nombre,String descripcion, float preciocompra, float presioventa, int stock, int categoria, int proveedor, String img){
+   public boolean insertarProducto(String nombre, String descripcion, double precio, String url_imagen, int stock, int categoria, int proveedor){
     
-       String sql = "INSERT INTO productos (nombre, descripcion, precio_compra, precio_venta, stock, categoria_id, proveedor_id)"
-               + "   VALUES (?,?,?,?,?,?,?);";
+       String sql = """
+                    INSERT INTO producto (nombre, descripcion, precio, stock, url_imagen, id_categoria, id_proveedor) VALUES
+                    (?, ?, ?, ?, ?, ?, ?)""";
+               
        try (
             Connection conn = ConexionBD.conectar();    
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -33,12 +38,11 @@ public class ProductosController {
            
            ps.setString(1, nombre);
            ps.setString(2, descripcion);
-           ps.setFloat(3, preciocompra);
-           ps.setFloat(4, presioventa);
-           ps.setInt(5, stock);
+           ps.setDouble(3, precio);
+           ps.setFloat(4, stock);
+           ps.setString(5, url_imagen);
            ps.setInt(6, categoria);
            ps.setInt(7, proveedor);
-           //ps.setString(8, img);
            
            int filasafectadas = ps.executeUpdate();
            if(filasafectadas > 0 ){
@@ -51,66 +55,72 @@ public class ProductosController {
        return false;  
    }
    
-   public DefaultTableModel TablaProductos(){
-       
-        String[] columnas = {"N°", "Nombre", "Descripcion", "Precio Compra","Precio Venta","Stock","Categoria","Proveedor"};
-        DefaultTableModel modelo = new DefaultTableModel(null, columnas);
+    public DefaultTableModel TablaProductos() {
+    
+            String[] columnas = {"N°", "Nombre", "Descripcion", "Precio", "Stock", "Imagen", "Categoria", "Proveedor"};
+            DefaultTableModel modelo = new DefaultTableModel(null, columnas);
 
-        String sql = """
-                     SELECT 
-                         productos.id, 
-                         productos.nombre, 
-                         productos.descripcion, 
-                         productos.precio_compra,
-                         productos.precio_venta, 
-                         productos.stock, 
-                         proveedores.nombre AS proveedor,
-                         categorias.nombre AS categoria
-                     FROM productos
-                     INNER JOIN proveedores ON productos.proveedor_id = proveedores.id
-                     INNER JOIN categorias ON productos.categoria_id = categorias.id""";
+            String sql = """
+                         SELECT 
+                             producto.id, 
+                             producto.nombre, 
+                             producto.descripcion, 
+                             producto.precio,
+                             producto.stock, 
+                             producto.url_imagen,
+                             categoria.nombre AS categoria,
+                             proveedor.nombre AS proveedor
+                         FROM producto
+                         INNER JOIN proveedor ON producto.id_proveedor = proveedor.id
+                         INNER JOIN categoria ON producto.id_categoria = categoria.id
+                         """;
 
-        try(
-            Connection conn = ConexionBD.conectar();    
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            ) 
-        {
-            while (rs.next()) {
-                Object[] fila = new Object[8];
-                fila[0] = rs.getInt("id");
-                fila[1] = rs.getString("nombre");
-                fila[2] = rs.getString("descripcion");
-                fila[3] = rs.getFloat("precio_compra");
-                fila[4] = rs.getFloat("precio_venta");
-                fila[5] = rs.getInt("stock");
-                fila[6] = rs.getString("categoria");
-                fila[7] = rs.getString("proveedor");       
-                
-                modelo.addRow(fila);
+            try (Connection conn = ConexionBD.conectar();
+                 PreparedStatement ps = conn.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    Object[] fila = new Object[8];
+                    fila[0] = rs.getInt("id");
+                    fila[1] = rs.getString("nombre");
+                    fila[2] = rs.getString("descripcion");
+                    fila[3] = rs.getFloat("precio");
+                    fila[4] = rs.getFloat("stock");
+
+                    String imagePath = rs.getString("url_imagen");
+                    ImageIcon icon;
+                    try {
+                        Image img = new ImageIcon(imagePath).getImage();
+                        icon = new ImageIcon(img.getScaledInstance(60, 60, Image.SCALE_SMOOTH));
+                    } catch (Exception e) {
+                        // Imagen por defecto en caso de error
+                        icon = new ImageIcon(new BufferedImage(60, 60, BufferedImage.TYPE_INT_ARGB));
+                    }
+                    fila[5] = icon;
+
+                    fila[6] = rs.getString("categoria");
+                    fila[7] = rs.getString("proveedor");
+
+                    modelo.addRow(fila);
+                }
+            } catch (Exception e) {
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
-        }
 
         return modelo;
-   }
+    }
+
    
    public void RellenarCombobox(String tabla, String valor, JComboBox combo){
        
-       String sql ="SELECT * FROM "+ tabla;
+       String sql ="SELECT nombre FROM "+ tabla;
        try (
             Connection conn = ConexionBD.conectar();    
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
         ){
-           while (rs.next()) {               
-               
-               //int id = rs.getInt("id");
-               //String nombre = rs.getString(valor);          
+           while (rs.next()) {                           
                combo.addItem(rs.getString(valor));
-           }
-           
+           }          
        } catch (Exception e) {
            JOptionPane.showMessageDialog(null, "ERROR" + e.toString());
        }
@@ -118,8 +128,7 @@ public class ProductosController {
    
    public float getPrecio(String nombre){
       
-    //continuar aqui querias obtener fecha precio imagen para colocar en la pantalla de ventas 
-    String sql = "select  precio_venta from productos where nombre = ?;";
+    String sql = "select  precio from producto where nombre = ?;";
     float precio = 0;
       
     try (Connection conn = ConexionBD.conectar();
@@ -129,7 +138,7 @@ public class ProductosController {
 
         ResultSet rs = pst.executeQuery();
         rs.next();
-        precio  = rs.getFloat("precio_venta");
+        precio  = rs.getFloat("precio");
         
 
      } catch (Exception e) {
@@ -138,5 +147,24 @@ public class ProductosController {
     return precio;
    }
            
-          
+  public String UrlImagenProducto(String nombre){
+      
+      String sql = "select url_imagen from producto where nombre = ?;";
+      String imagen = "";
+      
+    try (Connection conn = ConexionBD.conectar();
+         PreparedStatement pst = conn.prepareStatement(sql)) {
+
+        pst.setString(1, nombre);
+
+        ResultSet rs = pst.executeQuery();
+        rs.next();
+        imagen  = rs.getString("url_imagen");
+        
+
+     } catch (Exception e) {
+        System.err.println("Error : " + e.getMessage());
+        }
+     return imagen;
+  }       
 }

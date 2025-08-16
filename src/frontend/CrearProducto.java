@@ -5,7 +5,12 @@
 package frontend;
 
 import backend.ProductosController;
+import java.awt.Image;
+import java.io.File;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 /**
  *
  * @author Apoyo Docente
@@ -19,8 +24,8 @@ public class CrearProducto extends javax.swing.JFrame {
     
     public CrearProducto() {
         initComponents();
-        product.RellenarCombobox("categorias", "nombre", jComboBox1);
-        product.RellenarCombobox("proveedores", "nombre", jComboBox2);
+        product.RellenarCombobox("categoria", "nombre", jComboBox1);
+        product.RellenarCombobox("proveedor", "nombre", jComboBox2);
 
     }
 
@@ -46,12 +51,10 @@ public class CrearProducto extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jTextField4 = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jTextField5 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
         jComboBox1 = new javax.swing.JComboBox<>();
         jComboBox2 = new javax.swing.JComboBox<>();
         jTextField2 = new javax.swing.JTextField();
@@ -71,6 +74,11 @@ public class CrearProducto extends javax.swing.JFrame {
         jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jButton1.setText("AGERGAR");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel9.setText("Ruta:");
 
@@ -97,8 +105,8 @@ public class CrearProducto extends javax.swing.JFrame {
                     .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1)
                     .addComponent(jLabel9))
-                .addGap(48, 48, 48)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
                 .addContainerGap(40, Short.MAX_VALUE))
         );
 
@@ -108,9 +116,7 @@ public class CrearProducto extends javax.swing.JFrame {
 
         jLabel3.setText("Descripcion:");
 
-        jLabel4.setText("precio compra:");
-
-        jLabel5.setText("precio venta:");
+        jLabel4.setText("precio :");
 
         jLabel6.setText("Stock:");
 
@@ -141,7 +147,6 @@ public class CrearProducto extends javax.swing.JFrame {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel5)
                                     .addComponent(jLabel4)
                                     .addComponent(jLabel3)
                                     .addComponent(jLabel1)))
@@ -160,7 +165,6 @@ public class CrearProducto extends javax.swing.JFrame {
                     .addComponent(jTextField5, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jTextField4)
                     .addComponent(jTextField1)
-                    .addComponent(jTextField3)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.Alignment.TRAILING, 0, 167, Short.MAX_VALUE)
                     .addComponent(jComboBox2, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(39, 39, 39))
@@ -180,11 +184,7 @@ public class CrearProducto extends javax.swing.JFrame {
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(18, 18, 18)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel6))
@@ -269,26 +269,23 @@ public class CrearProducto extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
        
-     if( !jTextField1.getText().isEmpty() || !jTextField4.getText().isEmpty() || !jTextField3.getText().isEmpty() 
+     if( !jTextField1.getText().isEmpty() || !jTextField4.getText().isEmpty() 
          || !jTextField5.getText().isEmpty()||jComboBox1.getSelectedIndex() != 0 || jComboBox2.getSelectedIndex() != 0){
          
         String nombre = jTextField1.getText();
         String descripcion = jTextField2.getText();
-        float preciocompra = Float.parseFloat(jTextField4.getText());
-        float presioventa = Float.parseFloat(jTextField3.getText());
+        double precio = Float.parseFloat(jTextField4.getText());
+        //float presioventa = Float.parseFloat(jTextField3.getText());
         int stock = Integer.parseInt(jTextField5.getText());
-       
-        int categoria = jComboBox1.getSelectedIndex();
-        int proveedor = jComboBox2.getSelectedIndex();  
-             
         String img = jTextField8.getText();
+        int categoria = jComboBox1.getSelectedIndex();
+        int proveedor = jComboBox2.getSelectedIndex();       
+        
         if ( img.isEmpty()){
           JOptionPane.showMessageDialog(null, "Cargue una imagen");
         }else{
-        
-         boolean bol = product.insertarProducto(nombre, descripcion,preciocompra,presioventa,stock,categoria,proveedor,img);    
-         if(bol){
-            
+         boolean bol = product.insertarProducto(nombre, descripcion,precio,img,stock,categoria,proveedor);    
+         if(bol){          
             this.dispose();
         }
       }
@@ -299,7 +296,21 @@ public class CrearProducto extends javax.swing.JFrame {
          
     }//GEN-LAST:event_jButton2ActionPerformed
 
-  
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        File archivo;
+        JFileChooser flcAbrirArchivo = new JFileChooser();
+        flcAbrirArchivo.setFileFilter(new FileNameExtensionFilter("archivo de imagen","jpg","jpeg","png"));
+        int respuesta = flcAbrirArchivo.showOpenDialog(this);
+        if (respuesta == JFileChooser.APPROVE_OPTION){
+            archivo = flcAbrirArchivo.getSelectedFile();
+            jTextField8.setText(archivo.getAbsolutePath());
+            Image foto = getToolkit().getImage(jTextField8.getText());
+            foto = foto.getScaledInstance(170, 170, 1);
+            jLabel2.setIcon(new ImageIcon(foto));
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    
     /**
      * @param args the command line arguments
      */
@@ -345,7 +356,6 @@ public class CrearProducto extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -355,7 +365,6 @@ public class CrearProducto extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField8;
